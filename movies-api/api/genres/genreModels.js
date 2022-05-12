@@ -1,25 +1,10 @@
-import passport from 'passport';
-import passportJWT from 'passport-jwt';
-import UserModel from './../api/users/userModel';
-import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 
-dotenv.config();
+const Schema = mongoose.Schema;
 
-const JWTStrategy = passportJWT.Strategy;
-const ExtractJWT = passportJWT.ExtractJwt;
-
-let jwtOptions = {};
-jwtOptions.jwtFromRequest = ExtractJWT.fromAuthHeaderAsBearerToken();
-jwtOptions.secretOrKey = process.env.SECRET;
-
-const strategy = new JWTStrategy(jwtOptions, async (payload, next) => {
-  const user = await UserModel.findByUserName(payload);
-  if (user) {
-    next(null, user);
-  } else {
-    next(null, false);
-  }
+const GenreSchema = new Schema({
+  id: { type: Number,  unique: true, required: true},
+  name: {type: String, required: true }
 });
-passport.use(strategy);
 
-export default passport;
+export default mongoose.model('Genre', GenreSchema);
