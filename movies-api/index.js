@@ -1,11 +1,12 @@
-import './db';
-import './seedData'
 import dotenv from 'dotenv';
 import express from 'express';
 import moviesRouter from './api/movies';
-import genreRouter from './api/genres';
+import genresRouter from './api/genres';
 import usersRouter from './api/users';
-
+import './db';
+import './seedData';
+import session from 'express-session';
+import passport from './authenticate';
 
 dotenv.config();
 
@@ -22,11 +23,15 @@ const app = express();
 
 const port = process.env.PORT;
 
-app.use('/api/movies', moviesRouter);
-app.use('/api/genres',genreRouter);
-app.use('/api/users', usersRouter);
-app.use(errHandler);
 app.use(express.json());
+
+app.use(passport.initialize());
+
+app.use('/api/movies', passport.authenticate('jwt', {session: false}), moviesRouter);
+app.use('/api/genres', genresRouter);
+app.use('/api/users', usersRouter);
+
+app.use(errHandler);
 
 app.listen(port, () => {
   console.info(`Server running at ${port}`);
